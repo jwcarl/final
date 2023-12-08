@@ -2,47 +2,58 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 class Television:
-    MIN_VOLUME = 0
-    MAX_VOLUME = 5
-    MIN_CHANNEL = 0
-    MAX_CHANNEL = 3
+    """Class representing a Television object."""
 
-    def __init__(self):
+    MIN_VOLUME: int = 0
+    MAX_VOLUME: int = 5
+    MIN_CHANNEL: int = 0
+    MAX_CHANNEL: int = 3
+
+    def __init__(self) -> None:
+        """Initialize a Television object."""
+        self.__power: bool = False
+        self.__muted: bool = False
+        self.__volume: int = self.MIN_VOLUME
+        self.__channel: int = self.MIN_CHANNEL
+
+    def initialize(self) -> None:
+        """Initialize the Television object."""
         self.__power = False
         self.__muted = False
         self.__volume = self.MIN_VOLUME
         self.__channel = self.MIN_CHANNEL
 
-    def initialize(self):
-        self.__power = False
-        self.__muted = False
-        self.__volume = self.MIN_VOLUME
-        self.__channel = self.MIN_CHANNEL
-
-    def toggle_power(self):
+    def toggle_power(self) -> None:
+        """Toggle the power state of the television."""
         self.__power = not self.__power
 
-    def toggle_mute(self):
+    def toggle_mute(self) -> None:
+        """Toggle the mute state of the television."""
         if self.__power:
             self.__muted = not self.__muted
 
-    def channel_up(self):
+    def channel_up(self) -> None:
+        """Increase the channel by 1."""
         if self.__power:
             self.__channel = (self.__channel + 1) % (self.MAX_CHANNEL + 1)
 
-    def channel_down(self):
+    def channel_down(self) -> None:
+        """Decrease the channel by 1."""
         if self.__power:
             self.__channel = (self.__channel - 1) % (self.MAX_CHANNEL + 1)
 
-    def volume_up(self):
+    def volume_up(self) -> None:
+        """Increase the volume by 1, if not muted."""
         if self.__power and not self.__muted:
             self.__volume = min(self.__volume + 1, self.MAX_VOLUME)
 
-    def volume_down(self):
+    def volume_down(self) -> None:
+        """Decrease the volume by 1, if not muted."""
         if self.__power and not self.__muted:
             self.__volume = max(self.__volume - 1, self.MIN_VOLUME)
 
-    def get_channel_image(self):
+    def get_channel_image(self) -> Image.Image:
+        """Get the image corresponding to the current channel."""
         if self.__power:
             try:
                 image_path = f"{self.__channel}.png"
@@ -55,53 +66,60 @@ class Television:
         else:
             return Image.new("RGB", (150, 150), "black")
 
-    def is_power_on(self):
+    def is_power_on(self) -> bool:
+        """Check if the television is powered on."""
         return self.__power
 
-    def is_muted(self):
+    def is_muted(self) -> bool:
+        """Check if the television is muted."""
         return self.__muted
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Return a string representation of the Television object."""
         mute_status = "Muted" if self.__muted else "Unmuted"
         return f"Power = {self.__power}, Channel = {self.__channel}, Volume = {self.__volume}, {mute_status}"
 
-class TelevisionRemote:
-    def __init__(self, master):
-        self.master = master
-        self.master.title("TV Remote")
-        self.tv = Television()
 
-        self.image_box = tk.Label(self.master)
+class TelevisionRemote:
+    """Class representing a Television Remote GUI."""
+
+    def __init__(self, master: tk.Tk) -> None:
+        """Initialize the TelevisionRemote GUI."""
+        self.master: tk.Tk = master
+        self.master.title("TV Remote")
+        self.tv: Television = Television()
+
+        self.image_box: tk.Label = tk.Label(self.master)
         self.image_box.grid(row=0, column=0, rowspan=4, columnspan=4, padx=10, pady=10, sticky="nsew")
 
-        self.volume_notch_canvas = tk.Canvas(self.master, width=150, height=10, bg="white")
+        self.volume_notch_canvas: tk.Canvas = tk.Canvas(self.master, width=150, height=10, bg="white")
         self.volume_notch_canvas.grid(row=4, column=0, columnspan=4, pady=10, sticky="nsew")
 
-        self.volume_label = tk.Label(self.master, text="Volume: 0")
+        self.volume_label: tk.Label = tk.Label(self.master, text="Volume: 0")
         self.volume_label.grid(row=5, column=0, columnspan=4, pady=10, sticky="nsew")
 
-        self.mute_label = tk.Label(self.master, text="Mute: Unmuted")
+        self.mute_label: tk.Label = tk.Label(self.master, text="Mute: Unmuted")
         self.mute_label.grid(row=6, column=0, columnspan=4, pady=10, sticky="nsew")
 
-        self.channel_label = tk.Label(self.master, text="Channel: 0")
+        self.channel_label: tk.Label = tk.Label(self.master, text="Channel: 0")
         self.channel_label.grid(row=7, column=0, columnspan=4, pady=10, sticky="nsew")
 
-        self.power_button = tk.Button(self.master, text="Power", command=self.toggle_power)
+        self.power_button: tk.Button = tk.Button(self.master, text="Power", command=self.toggle_power)
         self.power_button.grid(row=8, column=0, columnspan=2, pady=10, padx=5, sticky="nsew")
 
-        self.mute_button = tk.Button(self.master, text="Mute", command=self.toggle_mute, state=tk.DISABLED)
+        self.mute_button: tk.Button = tk.Button(self.master, text="Mute", command=self.toggle_mute, state=tk.DISABLED)
         self.mute_button.grid(row=8, column=2, columnspan=2, pady=10, padx=5, sticky="nsew")
 
-        self.volume_up_button = tk.Button(self.master, text="Vol Up", command=self.volume_up, state=tk.DISABLED)
+        self.volume_up_button: tk.Button = tk.Button(self.master, text="Vol Up", command=self.volume_up, state=tk.DISABLED)
         self.volume_up_button.grid(row=9, column=0, columnspan=2, pady=10, padx=5, sticky="nsew")
 
-        self.volume_down_button = tk.Button(self.master, text="Vol Down", command=self.volume_down, state=tk.DISABLED)
+        self.volume_down_button: tk.Button = tk.Button(self.master, text="Vol Down", command=self.volume_down, state=tk.DISABLED)
         self.volume_down_button.grid(row=9, column=2, columnspan=2, pady=10, padx=5, sticky="nsew")
 
-        self.channel_up_button = tk.Button(self.master, text="Ch Up", command=self.channel_up, state=tk.DISABLED)
+        self.channel_up_button: tk.Button = tk.Button(self.master, text="Ch Up", command=self.channel_up, state=tk.DISABLED)
         self.channel_up_button.grid(row=10, column=0, columnspan=2, pady=10, padx=5, sticky="nsew")
 
-        self.channel_down_button = tk.Button(self.master, text="Ch Down", command=self.channel_down, state=tk.DISABLED)
+        self.channel_down_button: tk.Button = tk.Button(self.master, text="Ch Down", command=self.channel_down, state=tk.DISABLED)
         self.channel_down_button.grid(row=10, column=2, columnspan=2, pady=10, padx=5, sticky="nsew")
 
         self.create_number_pad()
@@ -113,56 +131,66 @@ class TelevisionRemote:
         self.update_channel_image()
         self.update_labels()
 
-    def create_number_pad(self):
+    def create_number_pad(self) -> None:
+        """Create the number pad for selecting channels."""
         for i in range(4):
             digit_button = tk.Button(self.master, text=str(i), command=lambda num=i: self.select_channel(num))
             digit_button.grid(row=11, column=i, pady=10, padx=5, sticky="nsew")
 
-    def select_channel(self, channel):
+    def select_channel(self, channel: int) -> None:
+        """Select a channel based on the number pad input."""
         if self.tv.is_power_on():
             self.tv._Television__channel = channel
             self.update_channel_image()
             self.update_labels()
 
-    def toggle_power(self):
+    def toggle_power(self) -> None:
+        """Toggle the power state of the television."""
         self.tv.toggle_power()
         state = tk.NORMAL if self.tv.is_power_on() else tk.DISABLED
         self.set_button_state(state)
         self.update_channel_image()
         self.update_labels()
 
-    def toggle_mute(self):
+    def toggle_mute(self) -> None:
+        """Toggle the mute state of the television."""
         self.tv.toggle_mute()
         volume_state = tk.DISABLED if self.tv.is_muted() else tk.NORMAL
         self.volume_up_button.config(state=volume_state)
         self.volume_down_button.config(state=volume_state)
         self.update_labels()
 
-    def channel_up(self):
+    def channel_up(self) -> None:
+        """Increase the channel by 1."""
         self.tv.channel_up()
         self.update_channel_image()
         self.update_labels()
 
-    def channel_down(self):
+    def channel_down(self) -> None:
+        """Decrease the channel by 1."""
         self.tv.channel_down()
         self.update_channel_image()
         self.update_labels()
 
-    def volume_up(self):
+    def volume_up(self) -> None:
+        """Increase the volume by 1."""
         self.tv.volume_up()
         self.update_labels()
 
-    def volume_down(self):
+    def volume_down(self) -> None:
+        """Decrease the volume by 1."""
         self.tv.volume_down()
         self.update_labels()
 
-    def update_channel_image(self):
+    def update_channel_image(self) -> None:
+        """Update the channel image on the GUI."""
         channel_image = self.tv.get_channel_image()
         photo = ImageTk.PhotoImage(channel_image)
         self.image_box.configure(image=photo)
         self.image_box.image = photo
 
-    def update_labels(self):
+    def update_labels(self) -> None:
+        """Update various labels on the GUI."""
         self.volume_label.config(text=f"Volume: {self.tv._Television__volume}")
         mute_status = "Muted" if self.tv._Television__muted else "Unmuted"
         self.mute_label.config(text=f"Mute: {mute_status}")
@@ -170,13 +198,15 @@ class TelevisionRemote:
 
         self.update_volume_notch()
 
-    def update_volume_notch(self):
+    def update_volume_notch(self) -> None:
+        """Update the volume notch on the GUI."""
         if self.tv.is_power_on():
             volume_width = (self.tv._Television__volume / self.tv.MAX_VOLUME) * 150
             self.volume_notch_canvas.delete("all")
             self.volume_notch_canvas.create_rectangle(0, 0, volume_width, 10, fill="green")
 
-    def set_button_state(self, state):
+    def set_button_state(self, state: str) -> None:
+        """Set the state of various buttons on the GUI."""
         self.volume_up_button.config(state=state)
         self.volume_down_button.config(state=state)
         self.channel_up_button.config(state=state)
